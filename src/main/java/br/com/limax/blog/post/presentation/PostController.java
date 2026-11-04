@@ -7,12 +7,14 @@ import br.com.limax.blog.post.presentation.mapper.PostMapper;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
+@Tag(name = "Post", description = "Gerenciamento de posts")
 @RequestMapping("/api/v1/posts")
 public class PostController {
     private final PostService postService;

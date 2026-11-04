@@ -1,6 +1,6 @@
+package br.com.limax.blog.config.exception;
 
-package br.com.limax.blog.post.presentation.exception;
-
+import br.com.limax.blog.auth.application.exceptions.UserAlreadyExistsException;
 import br.com.limax.blog.post.application.exceptions.PostNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +26,22 @@ public class GlobalExceptionHandler {
         var status = HttpStatus.NOT_FOUND;
 
         log.warn("Post not found: {}", ex.getMessage());
+
+        var response = new ApiErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                ex.getMessage(),
+                Instant.now()
+        );
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleAlreadyExistsUser(UserAlreadyExistsException ex){
+        var status = HttpStatus.CONFLICT;
+
+        log.warn("User already exists: {}", ex.getMessage());
 
         var response = new ApiErrorResponse(
                 status.value(),

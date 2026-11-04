@@ -1,4 +1,4 @@
-package br.com.limax.blog.post.presentation.exception;
+package br.com.limax.blog.config.exception;
 
 import java.time.Instant;
 

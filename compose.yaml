@@ -1,3 +1,4 @@
+
 services:
   db:
     image: postgres:15
@@ -11,6 +12,11 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lima -d blog_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   app:
     build: .
@@ -22,9 +28,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/blog_db
       SPRING_DATASOURCE_USERNAME: lima
       SPRING_DATASOURCE_PASSWORD: 141925
-      SPRNIG_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
   postgres_data:
