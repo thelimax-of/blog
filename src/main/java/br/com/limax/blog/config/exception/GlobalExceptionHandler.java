@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -128,6 +129,22 @@ public class GlobalExceptionHandler {
                 status.value(),
                 status.getReasonPhrase(),
                 ex.getMessage(),
+                Instant.now()
+        );
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiErrorResponse> handleAuthenticationException(AuthenticationException ex) {
+        var status = HttpStatus.UNAUTHORIZED;
+
+        log.warn("Authentication failed: {}", ex.getMessage());
+
+        var response = new ApiErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                "Invalid username or password.",
                 Instant.now()
         );
 

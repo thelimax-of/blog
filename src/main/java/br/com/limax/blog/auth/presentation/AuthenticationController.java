@@ -1,9 +1,11 @@
 package br.com.limax.blog.auth.presentation;
 
 import br.com.limax.blog.auth.application.AuthorizationService;
+import br.com.limax.blog.auth.domain.User;
+import br.com.limax.blog.auth.infrastructure.security.TokenService;
 import br.com.limax.blog.auth.presentation.dto.LoginRequest;
+import br.com.limax.blog.auth.presentation.dto.LoginResponse;
 import br.com.limax.blog.auth.presentation.dto.RegisterRequest;
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,21 +23,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
     private final AuthorizationService authorizationService;
     private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
 
     public AuthenticationController(
             AuthorizationService authorizationService,
-            AuthenticationManager authenticationManager
+            AuthenticationManager authenticationManager,
+            TokenService tokenService
     ) {
         this.authorizationService = authorizationService;
         this.authenticationManager = authenticationManager;
+        this.tokenService = tokenService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody @Valid LoginRequest request){
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request){
         var usernamePassword = new UsernamePasswordAuthenticationToken(request.username(), request.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
+        var token = tokenService.generateToken((User) auth.getPrincipal());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new LoginResponse(token));
     }
 
     @PostMapping("/register")
